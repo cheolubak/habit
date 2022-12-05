@@ -13,7 +13,7 @@ export class User {
     name: 'user_id',
     comment: '사용자 id',
   })
-  private readonly _userId: number;
+  readonly userId: number;
 
   @Column('varchar', {
     length: 30,
@@ -22,7 +22,7 @@ export class User {
     unique: true,
     comment: '사용자 이메일(facebook, kakao 등에서 이메일이 없을수도 있음)',
   })
-  private _email?: string;
+  readonly email?: string;
 
   @Column('varchar', {
     length: 20,
@@ -31,7 +31,7 @@ export class User {
     unique: true,
     comment: '사용자 닉네임',
   })
-  private _nickname: string;
+  readonly nickname: string;
 
   @Column('varchar', {
     length: 32,
@@ -40,7 +40,7 @@ export class User {
     unique: true,
     comment: '사용자 firebase uid',
   })
-  private _uid: string;
+  readonly uid: string;
 
   @Column('varchar', {
     length: 100,
@@ -48,7 +48,7 @@ export class User {
     nullable: false,
     comment: '사용자 프로필 이미지',
   })
-  private _profile: string;
+  readonly profile: string;
 
   @CreateDateColumn({
     type: 'datetime',
@@ -65,9 +65,9 @@ export class User {
   readonly updatedAt: Date;
 
   constructor(nickname: string, uid: string, profile: string, email?: string) {
-    this._email = email;
-    this._nickname = nickname;
-    this._uid = uid;
-    this._profile = profile;
+    this.email = email;
+    this.nickname = nickname;
+    this.uid = uid;
+    this.profile = profile;
   }
 }

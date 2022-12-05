@@ -8,7 +8,6 @@ export class Firebase {
     if (!!this._firebaseApp) {
       return this._firebaseApp;
     } else {
-      console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
       this._firebaseApp = initializeApp({
         apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
         authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
