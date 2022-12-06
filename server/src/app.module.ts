@@ -6,9 +6,17 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { HabitModule } from './habit/habit.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, UserModule, AuthModule, HabitModule],
+  imports: [
+    ConfigModule.forRoot(),
+    DatabaseModule,
+    ScheduleModule.forRoot(),
+    UserModule,
+    AuthModule,
+    HabitModule,
+  ],
   controllers: [AppController],
   providers: [],
 })

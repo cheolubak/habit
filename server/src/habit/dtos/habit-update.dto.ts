@@ -1,8 +1,8 @@
-import { IsDate, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class HabitPostDto {
+export class HabitUpdateDto {
   @ApiProperty({
     type: 'string',
     description: '습관 제목',
@@ -22,17 +22,6 @@ export class HabitPostDto {
   @IsNotEmpty()
   @Length(1, 100)
   description: string;
-
-  @ApiProperty({
-    type: 'string',
-    format: 'date-time',
-    description: '습관 시작 일시',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date || undefined)
-  startDate: Date;
 
   @ApiProperty({
     type: 'string',
