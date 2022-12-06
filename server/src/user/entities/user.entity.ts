@@ -10,32 +10,32 @@ import {
 export class User {
   @PrimaryGeneratedColumn('increment', {
     type: 'int',
-    name: 'user_id',
+    name: 'id',
     comment: '사용자 id',
   })
   readonly userId: number;
 
   @Column('varchar', {
     length: 30,
-    name: 'user_email',
+    name: 'email',
     nullable: true,
     unique: true,
     comment: '사용자 이메일(facebook, kakao 등에서 이메일이 없을수도 있음)',
   })
-  readonly email?: string;
+  email?: string;
 
   @Column('varchar', {
     length: 20,
-    name: 'user_nickname',
+    name: 'nickname',
     nullable: false,
     unique: true,
     comment: '사용자 닉네임',
   })
-  readonly nickname: string;
+  nickname: string;
 
   @Column('varchar', {
     length: 32,
-    name: 'user_uid',
+    name: 'uid',
     nullable: false,
     unique: true,
     comment: '사용자 firebase uid',
@@ -44,11 +44,11 @@ export class User {
 
   @Column('varchar', {
     length: 100,
-    name: 'user_profile',
+    name: 'profile',
     nullable: false,
     comment: '사용자 프로필 이미지',
   })
-  readonly profile: string;
+  profile: string;
 
   @CreateDateColumn({
     type: 'datetime',
@@ -64,10 +64,7 @@ export class User {
   })
   readonly updatedAt: Date;
 
-  constructor(nickname: string, uid: string, profile: string, email?: string) {
-    this.email = email;
-    this.nickname = nickname;
-    this.uid = uid;
-    this.profile = profile;
+  constructor(partial?: Partial<User>) {
+    Object.assign(this, partial);
   }
 }

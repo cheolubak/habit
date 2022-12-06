@@ -4,14 +4,22 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User } from '~/user/entities/user.entity';
+import { HabitHistory } from '~/habit/entities/habit-history.entity';
+import { HabitStatus } from '~/habit/habit-status.enum';
 
 @Entity('habit')
 export class Habit {
-  @PrimaryGeneratedColumn('increment', { type: 'int', name: 'habit_id' })
+  @PrimaryGeneratedColumn('increment', {
+    type: 'int',
+    name: 'id',
+    unsigned: true,
+    comment: '습관 ID',
+  })
   readonly habitId: number;
 
   @Column('varchar', {
@@ -34,6 +42,7 @@ export class Habit {
     name: 'complete_count',
     unsigned: true,
     nullable: false,
+    default: 0,
     comment: '습관 완성 횟수',
   })
   completeCount: number;
@@ -42,6 +51,7 @@ export class Habit {
     name: 'not_complete_count',
     unsigned: true,
     nullable: false,
+    default: 0,
     comment: '습관 완성 못한 횟수',
   })
   notCompleteCount: number;
@@ -55,12 +65,19 @@ export class Habit {
   isEnd: boolean;
 
   @Column('datetime', {
-    name: 'started_at',
+    name: 'start_at',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
     comment: '습관 시작 일시',
   })
-  startedAt: Date;
+  readonly startAt: Date;
+
+  @Column('datetime', {
+    name: 'end_at',
+    nullable: true,
+    comment: '습관 종료 일시',
+  })
+  endAt: Date;
 
   @CreateDateColumn({
     type: 'datetime',
@@ -68,7 +85,7 @@ export class Habit {
     nullable: false,
     comment: '습관 생성 일자',
   })
-  createdAt: Date;
+  readonly createdAt: Date;
 
   @UpdateDateColumn({
     type: 'datetime',
@@ -76,9 +93,28 @@ export class Habit {
     nullable: false,
     comment: '습관 수정 일자',
   })
-  updatedAt: Date;
+  readonly updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.userId, { nullable: false })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  readonly user: User;
+
+  @OneToMany(() => HabitHistory, (history) => history.habit)
+  history: HabitHistory[];
+
+  constructor(partial?: Partial<Habit>) {
+    Object.assign(this, partial);
+  }
+
+  complete() {
+    this.completeCount += 1;
+    return new HabitHistory({
+      habitId: this.habitId,
+      status: HabitStatus.COMPLETE,
+    });
+  }
+
+  notComplete() {
+    this.notCompleteCount += 1;
+  }
 }
