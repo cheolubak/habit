@@ -46,7 +46,7 @@ export class Habit {
     default: 0,
     comment: '습관 완성 횟수',
   })
-  completeCount: number;
+  completeCount: number = 0;
 
   @Column('smallint', {
     name: 'not_complete_count',
@@ -55,7 +55,7 @@ export class Habit {
     default: 0,
     comment: '습관 완성 못한 횟수',
   })
-  notCompleteCount: number;
+  notCompleteCount: number = 0;
 
   @Column('boolean', {
     name: 'is_end',
@@ -63,7 +63,7 @@ export class Habit {
     nullable: false,
     comment: '습관 종료 여부',
   })
-  isEnd: boolean;
+  isEnd: boolean = false;
 
   @Column('boolean', {
     name: 'is_delete',
@@ -71,7 +71,7 @@ export class Habit {
     nullable: false,
     comment: '습관 삭제 여부',
   })
-  isDelete: boolean;
+  isDelete: boolean = false;
 
   @Column('datetime', {
     name: 'start_at',
@@ -79,14 +79,14 @@ export class Habit {
     default: () => 'CURRENT_TIMESTAMP',
     comment: '습관 시작 일시',
   })
-  readonly startAt: Date;
+  readonly startAt: Date = new Date();
 
   @Column('datetime', {
     name: 'end_at',
     nullable: true,
     comment: '습관 종료 일시',
   })
-  endAt: Date;
+  endAt: Date | null = null;
 
   @CreateDateColumn({
     type: 'datetime',
@@ -142,6 +142,14 @@ export class Habit {
     return new HabitHistory({
       habit: this,
       status: HabitStatus.DELETE,
+    });
+  }
+
+  end() {
+    this.isEnd = true;
+    return new HabitHistory({
+      habit: this,
+      status: HabitStatus.END,
     });
   }
 }
