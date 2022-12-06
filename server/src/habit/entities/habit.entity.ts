@@ -11,6 +11,7 @@ import {
 import { User } from '~/user/entities/user.entity';
 import { HabitHistory } from '~/habit/entities/habit-history.entity';
 import { HabitStatus } from '~/habit/habit-status.enum';
+import { HabitUpdateDto } from '~/habit/dtos/habit-update.dto';
 
 @Entity('habit')
 export class Habit {
@@ -64,6 +65,14 @@ export class Habit {
   })
   isEnd: boolean;
 
+  @Column('boolean', {
+    name: 'is_delete',
+    default: false,
+    nullable: false,
+    comment: '습관 삭제 여부',
+  })
+  isDelete: boolean;
+
   @Column('datetime', {
     name: 'start_at',
     nullable: false,
@@ -106,15 +115,33 @@ export class Habit {
     Object.assign(this, partial);
   }
 
+  change({ title, description, endDate }: HabitUpdateDto) {
+    this.title = title;
+    this.description = description;
+    this.endAt = endDate;
+  }
+
   complete() {
     this.completeCount += 1;
     return new HabitHistory({
-      habitId: this.habitId,
+      habit: this,
       status: HabitStatus.COMPLETE,
     });
   }
 
   notComplete() {
     this.notCompleteCount += 1;
+    return new HabitHistory({
+      habit: this,
+      status: HabitStatus.NOT_COMPLETE,
+    });
+  }
+
+  delete() {
+    this.isDelete = true;
+    return new HabitHistory({
+      habit: this,
+      status: HabitStatus.DELETE,
+    });
   }
 }
