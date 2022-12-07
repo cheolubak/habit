@@ -4,14 +4,17 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
-import { UserRegisterDto } from '../user/dtos/user-register.dto';
-import { User } from '../user/entities/user.entity';
+import { User } from '~/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as nanoid from 'nanoid';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
@@ -20,32 +23,33 @@ export class AuthService {
     return await getAuth().verifyIdToken(token);
   }
 
-  async registerUser(body: UserRegisterDto) {
-    return this.checkUserToken(body.token)
-      .then((user) => {
-        return this.userRepository.save(
-          new User({
-            nickname: body.nickname,
-            uid: user.uid,
-            profile: body.profile ?? user.picture ?? '/empty-profile.png',
-            email: user.email,
-          }),
-        );
-      })
-      .then((user) => user)
-      .catch((err) => {
-        console.error('registerUser', err);
-        const code = err.code;
-        if (code === 'ER_DUP_ENTRY') {
-          throw new ConflictException(err.message);
-        } else if (code === 'auth/argument-error') {
-          throw new BadRequestException('인증 정보가 잘못되었어요.');
-        } else if (code === 'auth/id-token-expired') {
-          throw new BadRequestException('인증 정보가 만료되었어요.');
-        } else {
-          throw new InternalServerErrorException(err.message);
-        }
-      });
+  private async registerUser(token: string) {
+    try {
+      const decodedToken = await this.checkUserToken(token);
+      return this.userRepository.save(
+        new User({
+          nickname: `HABIT_#${nanoid.customAlphabet(
+            '0123456789abcdefghijklmnopqrstuvwxyz',
+            6,
+          )()}`,
+          uid: decodedToken.uid,
+          profile: decodedToken.picture ?? '/empty-profile.png',
+          email: decodedToken.email,
+        }),
+      );
+    } catch (err) {
+      this.logger.error('registerUser', err);
+      const code = err.code;
+      if (code === 'ER_DUP_ENTRY') {
+        throw new ConflictException(err.message);
+      } else if (code === 'auth/argument-error') {
+        throw new BadRequestException('인증 정보가 잘못되었어요.');
+      } else if (code === 'auth/id-token-expired') {
+        throw new BadRequestException('인증 정보가 만료되었어요.');
+      } else {
+        throw new InternalServerErrorException(err.message);
+      }
+    }
   }
 
   async validator(token?: string) {
@@ -55,12 +59,16 @@ export class AuthService {
         const user = this.userRepository.findOne({
           where: { uid: decodedToken.uid },
         });
-        return user;
+        if (!user) {
+          return await this.registerUser(token);
+        } else {
+          return user;
+        }
       } else {
         return null;
       }
     } catch (err) {
-      console.error('validator', err);
+      this.logger.error(err);
       const code = err.code;
       if (code === 'auth/argument-error') {
         throw new BadRequestException('인증 정보가 잘못되었어요.');

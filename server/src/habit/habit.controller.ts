@@ -24,7 +24,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { PagePipe } from '~/common/pipe/page.pipe';

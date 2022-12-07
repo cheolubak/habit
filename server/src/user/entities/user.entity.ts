@@ -28,7 +28,7 @@ export class User {
     length: 20,
     name: 'nickname',
     nullable: false,
-    unique: true,
+    unique: false,
     comment: '사용자 닉네임',
   })
   nickname: string;
