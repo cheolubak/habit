@@ -1,16 +1,7 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserRegisterDto {
-  @ApiProperty({
-    type: 'string',
-    description: 'Firebase ID Token',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  token: string;
-
+export class UserUpdateDto {
   @ApiProperty({
     type: 'string',
     description: '유저 프로필 이미지 URL or BASE64',
